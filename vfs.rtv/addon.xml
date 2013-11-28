@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+  id="vfs.rtv"
+  version="1.0.0"
+  name="RTV support"
+  provider-name="spiff">
+  <requires>
+    <import addon="xbmc.vfs" version="1.0.0"/>
+  </requires>
+  <extension
+    point="xbmc.vfs"
+    protocols="rtv"
+    files="true"
+    directories="true"
+    library_linux="vfs.rtv.so"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">RTV support</summary>
+    <description lang="en">RTV support</description>
+    <platform>all</platform>
+  </extension>
+</addon>
