@@ -180,14 +180,11 @@ static bool Open_internal(RTVContext* ctx, const char* hostname,
   return true;
 }
 
-void* Open(const char* url, const char* hostname,
-           const char* filename, unsigned int port,
-           const char* options, const char* username,
-           const char* password)
+void* Open(VFSURL* url)
 {
   RTVContext* result = new RTVContext;
 
-  if (Open_internal(result, hostname, filename, port))
+  if (Open_internal(result, url->hostname, url->filename, url->port))
     return result;
 
   delete result;
@@ -256,18 +253,12 @@ int64_t Seek(void* context, int64_t iFilePosition, int iWhence)
   return ctx->pos;
 }
 
-bool Exists(const char* url, const char* hostname,
-            const char* filename, unsigned int port,
-            const char* options, const char* username,
-            const char* password)
+bool Exists(VFSURL* url)
 {
   return true;
 }
 
-int Stat(const char* url, const char* hostname,
-         const char* filename2, unsigned int port,
-         const char* options, const char* username,
-         const char* password, struct __stat64* buffer)
+int Stat(VFSURL* url, struct __stat64* buffer)
 {
   return -1;
 }
@@ -285,10 +276,7 @@ void DisconnectAll()
 {
 }
 
-bool DirectoryExists(const char* url, const char* hostname,
-                     const char* filename, unsigned int port,
-                     const char* options, const char* username,
-                     const char* password)
+bool DirectoryExists(VFSURL* url)
 {
   return false;
 }
@@ -311,23 +299,19 @@ static int Replace(std::string &str, const std::string &oldStr, const std::strin
   return replacedChars;
 }
 
-void* GetDirectory(const char* url, const char* hostname,
-                   const char* filename, unsigned int port,
-                   const char* options, const char* username,
-                   const char* password, VFSDirEntry** items,
-                   int* num_items)
+void* GetDirectory(VFSURL* url, VFSDirEntry** items, int* num_items)
 {
-  std::string strRoot = url;
+  std::string strRoot = url->url;
   if (strRoot[strRoot.size()-1] != '/')
     strRoot += '/';
 
-  std::string host(hostname);
+  std::string host(url->hostname);
 
   // Host name is "*" so we try to discover all ReplayTVs.  This requires some trickery but works.
-  if (strcmp(hostname,"*") == 0)
+  if (strcmp(url->hostname,"*") == 0)
   {
     // Check to see whether the URL's path is blank or "Video"
-    if (strlen(filename) == 0u || strcmp(filename, "Video") == 0)
+    if (strlen(url->filename) == 0u || strcmp(url->filename, "Video") == 0)
     {
       int iOldSize=0;
       struct RTV * rtv = NULL;
@@ -351,6 +335,7 @@ void* GetDirectory(const char* url, const char* hostname,
       {
         (*itms)[i].path = strdup((strRoot+rtv[i].hostname).c_str());
         (*itms)[i].label = strdup(rtv[i].friendlyName);
+        (*itms)[i].title = NULL;
         (*itms)[i].folder = true;
         (*itms)[i].properties = new VFSProperty;
         (*itms)[i].properties->name = strdup("propmisusepreformatted");
@@ -389,14 +374,14 @@ void* GetDirectory(const char* url, const char* hostname,
   if (port != 0)
   {
     char buffer[10];
-    sprintf(buffer,"%i", port);
+    sprintf(buffer,"%i", url->port);
     strHostAndPort += ':';
     strHostAndPort += buffer;
   }
 
   std::vector<VFSDirEntry>* itms = new std::vector<VFSDirEntry>();
   // No path given, list shows from ReplayGuide
-  if (strlen(filename) == 0)
+  if (strlen(url->filename) == 0)
   {
     unsigned char * data = NULL;
 
@@ -514,6 +499,7 @@ void* GetDirectory(const char* url, const char* hostname,
         VFSDirEntry entry;
         entry.label = strdup(szName);
         entry.path = strdup((strRoot+szPath).c_str());
+        entry.title = NULL;
         entry.size = dwFileSize*1000;
         entry.folder = bIsFolder;
         entry.properties = new VFSProperty;
@@ -538,7 +524,7 @@ void* GetDirectory(const char* url, const char* hostname,
     unsigned long status;
 
     // Return a listing of all files in the given path
-    status = rtv_list_files(&data, strHostAndPort.c_str(), filename);
+    status = rtv_list_files(&data, strHostAndPort.c_str(), url->filename);
     if (status == 0)
     {
       delete itms;
@@ -568,6 +554,7 @@ void* GetDirectory(const char* url, const char* hostname,
             VFSDirEntry entry;
             entry.label = strdup(p);
             entry.path = strdup((strRoot+p).c_str());
+            entry.title = NULL;
             entry.size = -1;
             entry.folder = false;
             entry.properties = new VFSProperty;
@@ -607,18 +594,12 @@ void FreeDirectory(void* items)
   delete &ctx;
 }
 
-bool CreateDirectory(const char* url, const char* hostname,
-                     const char* filename, unsigned int port,
-                     const char* options, const char* username,
-                     const char* password)
+bool CreateDirectory(VFSURL* url)
 {
   return false;
 }
 
-bool RemoveDirectory(const char* url, const char* hostname,
-                     const char* filename, unsigned int port,
-                     const char* options, const char* username,
-                     const char* password)
+bool RemoveDirectory(VFSURL* url)
 {
   return false;
 }
@@ -633,39 +614,22 @@ int Write(void* context, const void* lpBuf, int64_t uiBufSize)
   return -1;
 }
 
-bool Delete(const char* url, const char* hostname,
-            const char* filename2, unsigned int port,
-            const char* options, const char* username,
-            const char* password)
+bool Delete(VFSURL* url)
 {
   return false;
 }
 
-bool Rename(const char* url, const char* hostname,
-            const char* filename, unsigned int port,
-            const char* options, const char* username,
-            const char* password,
-            const char* url2, const char* hostname2,
-            const char* filename2, unsigned int port2,
-            const char* options2, const char* username2,
-            const char* password2)
+bool Rename(VFSURL* url, VFSURL* url2)
 {
   return false;
 }
 
-void* OpenForWrite(const char* url, const char* hostname,
-                   const char* filename2, unsigned int port,
-                   const char* options, const char* username,
-                   const char* password, bool bOverWrite)
+void* OpenForWrite(VFSURL* url, bool bOverWrite)
 {
   return NULL;
 }
 
-void* ContainsFiles(const char* url, const char* hostname,
-                    const char* filename2, unsigned int port,
-                    const char* options, const char* username,
-                    const char* password,
-                    VFSDirEntry** items, int* num_items)
+void* ContainsFiles(VFSURL* url, VFSDirEntry** items, int* num_items)
 {
   return NULL;
 }
@@ -698,6 +662,11 @@ bool SelectChannel(void* context, unsigned int channel)
 bool UpdateItem(void* context)
 {
   return false;
+}
+
+int GetChunkSize(void* context)
+{
+  return 0;
 }
 
 }
