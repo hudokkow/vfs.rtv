@@ -371,7 +371,7 @@ void* GetDirectory(VFSURL* url, VFSDirEntry** items, int* num_items)
   // Allow for ReplayTVs on ports other than 80
   std::string strHostAndPort;
   strHostAndPort = host;
-  if (port != 0)
+  if (url->port != 0)
   {
     char buffer[10];
     sprintf(buffer,"%i", url->port);
