@@ -299,7 +299,8 @@ static int Replace(std::string &str, const std::string &oldStr, const std::strin
   return replacedChars;
 }
 
-void* GetDirectory(VFSURL* url, VFSDirEntry** items, int* num_items)
+void* GetDirectory(VFSURL* url, VFSDirEntry** items,
+                   int* num_items, VFSCallbacks* callbacks)
 {
   std::string strRoot = url->url;
   if (strRoot[strRoot.size()-1] != '/')
