@@ -630,7 +630,7 @@ void* OpenForWrite(VFSURL* url, bool bOverWrite)
   return NULL;
 }
 
-void* ContainsFiles(VFSURL* url, VFSDirEntry** items, int* num_items)
+void* ContainsFiles(VFSURL* url, VFSDirEntry** items, int* num_items, char* rootpath)
 {
   return NULL;
 }
