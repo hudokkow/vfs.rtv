@@ -18,8 +18,8 @@
  *
  */
 
-#include "xbmc/libXBMC_addon.h"
-#include "xbmc/threads/mutex.h"
+#include "kodi/libXBMC_addon.h"
+#include "kodi/threads/mutex.h"
 #include <map>
 #include <sstream>
 #include <tinyxml.h>
@@ -30,8 +30,8 @@ ADDON::CHelper_libXBMC_addon *XBMC           = NULL;
 
 extern "C" {
 
-#include "xbmc/xbmc_vfs_dll.h"
-#include "xbmc/IFileTypes.h"
+#include "kodi/kodi_vfs_dll.h"
+#include "kodi/IFileTypes.h"
 #include "interface.h"
 
 //-- Create -------------------------------------------------------------------
@@ -199,6 +199,8 @@ bool Close(void* context)
     rtv_close_file(ctx->rtvd);
 
   delete ctx;
+
+  return true;
 }
 
 int64_t GetLength(void* context)
