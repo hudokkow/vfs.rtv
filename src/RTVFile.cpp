@@ -176,7 +176,7 @@ static bool Open_internal(RTVContext* ctx, const char* hostname,
     return false;
   }
 
-  XBMC->Log(ADDON::LOG_DEBUG, "%s - Opened %s on %s, Size %"PRIu64", Position %"PRIu64"", __FUNCTION__, hostname, filename, ctx->size, ctx->pos);
+  XBMC->Log(ADDON::LOG_DEBUG, "%s - Opened %s on %s, Size %" PRIu64 ", Position %" PRIu64 "", __FUNCTION__, hostname, filename, ctx->size, ctx->pos);
   return true;
 }
 
